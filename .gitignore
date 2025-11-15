@@ -1,0 +1,53 @@
+# Fichier : .gitignore
+#
+# Ignore les fichiers générés et les secrets pour le projet Pegasus
+# (backend FastAPI + frontend React/Vite).
+
+#######################
+# Section backend (Python)
+#######################
+
+# Environnement virtuel local (.pegasus)
+backend/.pegasus/
+backend/.venv/
+venv/
+.env/
+
+# Compilés Python
+backend/**/*.pyc
+backend/**/__pycache__/
+backend/.pytest_cache/
+backend/.mypy_cache/
+
+# Fichiers d'environnement / secrets
+backend/.env
+backend/.env.*
+backend/.DS_Store
+
+#######################
+# Section frontend (Node / Vite)
+#######################
+
+frontend/node_modules/
+frontend/dist/
+frontend/.vite/
+
+# Fichiers d'environnement
+frontend/.env
+frontend/.env.*
+
+# Logs
+frontend/npm-debug.log*
+frontend/yarn-debug.log*
+frontend/yarn-error.log*
+frontend/pnpm-debug.log*
+
+#######################
+# Éditeurs / OS
+#######################
+
+.vscode/
+.idea/
+*.swp
+.DS_Store
+Thumbs.db
