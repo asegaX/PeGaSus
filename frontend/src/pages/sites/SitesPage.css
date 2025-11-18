@@ -1,0 +1,36 @@
+/**
+ * Fichier : frontend/src/pages/SitesPage.css
+ *
+ * Styles dédiés à la page "Sites" (`SitesPage`).
+ *
+ * Objectifs :
+ * -----------
+ * - encadrer proprement la section "Sites" dans le layout principal ;
+ * - permettre d'ajouter facilement des blocs complémentaires (KPI, filtres, etc.)
+ *   autour du tableau sans toucher au composant DataTable lui-même ;
+ * - garder le style de page minimal, car le "premium" visuel est géré
+ *   par les composants génériques (DataTable, RecordDetailModal, Navbar, Sidebar).
+ *
+ * Convention :
+ * ------------
+ * - toutes les classes spécifiques à cette page sont préfixées par `sites-page`.
+ */
+
+/**
+ * Conteneur principal de la page Sites.
+ *
+ * Rôle :
+ * ------
+ * - assurer une colonne verticale qui contient :
+ *   - le tableau des sites ;
+ *   - le modal de détail (porté par React à ce niveau) ;
+ * - gérer l'espacement vertical entre les futurs blocs (si on ajoute des KPIs,
+ *   filtres avancés, bandeaux d’information, etc.).
+ */
+.sites-page {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;          /* espace entre les différents blocs de la page */
+  width: 100%;
+  box-sizing: border-box;
+}

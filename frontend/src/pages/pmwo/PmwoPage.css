@@ -1,0 +1,37 @@
+/**
+ * Fichier : frontend/src/pages/PmwoPage.css
+ *
+ * Styles dédiés à la page "PMWO" (`PmwoPage`).
+ *
+ * Objectifs :
+ * -----------
+ * - encadrer la section PMWO à l'intérieur de la zone de contenu de MainLayout ;
+ * - offrir un conteneur flexible pour :
+ *   - le tableau `DataTable` configuré pour les PMWO ;
+ *   - d'éventuels panneaux additionnels (KPI, filtres, messages métier) ;
+ * - respecter la logique de séparation :
+ *   - les composants génériques conservent leur style interne "premium" ;
+ *   - ce fichier se limite au layout et au spacing spécifiques à la page.
+ *
+ * Convention :
+ * ------------
+ * - toutes les classes propres à cette page sont préfixées par `pmwo-page`.
+ */
+
+/**
+ * Conteneur principal de la page PMWO.
+ *
+ * Rôle :
+ * ------
+ * - organiser verticalement les blocs de la page PMWO (tableau, futurs KPI, etc.) ;
+ * - consommer la largeur disponible fournie par `MainLayout` ;
+ * - préparer le terrain pour des évolutions (bandeau de contexte, filtres,
+ *   indicateurs de couverture préventive, etc.) sans toucher au TSX.
+ */
+.pmwo-page {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;           /* espace vertical entre les différents blocs */
+  width: 100%;
+  box-sizing: border-box;
+}

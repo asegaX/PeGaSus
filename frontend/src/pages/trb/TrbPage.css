@@ -1,0 +1,37 @@
+/**
+ * Fichier : frontend/src/pages/TrbPage.css
+ *
+ * Styles dédiés à la page "TRB" (`TrbPage`).
+ *
+ * Objectifs :
+ * -----------
+ * - encadrer proprement la section TRB dans le layout principal ;
+ * - offrir un conteneur souple pour :
+ *   - le tableau TRB ;
+ *   - d'éventuels blocs supplémentaires (KPI, filtres, bandeaux de statut)
+ *     à ajouter ultérieurement ;
+ * - laisser les composants génériques (DataTable, RecordDetailModal, Navbar,
+ *   Sidebar, etc.) gérer eux-mêmes leur style "premium".
+ *
+ * Convention de nommage :
+ * -----------------------
+ * - toutes les classes spécifiques à cette page sont préfixées par `trb-page`.
+ */
+
+/**
+ * Conteneur principal de la page TRB.
+ *
+ * Rôle :
+ * ------
+ * - organiser verticalement les différents blocs de la page ;
+ * - garantir une largeur fluide à 100% de la zone de contenu de MainLayout ;
+ * - préparer le terrain pour des évolutions futures (section KPI au-dessus
+ *   du tableau, filtres avancés, panneaux d’alertes, etc.).
+ */
+.trb-page {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;         /* espace entre les blocs (tableau, futurs KPIs, etc.) */
+  width: 100%;
+  box-sizing: border-box;
+}

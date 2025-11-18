@@ -1,10 +1,15 @@
 /**
- * Fichier : frontend/src/components/sidebar/index.ts
+ * Point d'entrée du module `components/sidebar`.
  *
- * Point d'entrée du module Sidebar.
- * Permet d'importer le composant et ses types via :
- *   import Sidebar, { SidebarItem } from "./components/sidebar";
+ * Rôle :
+ * ------
+ * - réexporter le composant Sidebar en export par défaut ;
+ * - réexporter les types publics associés (SidebarItem, SidebarSection, SidebarProps).
  */
 
 export { default } from "./Sidebar";
-export type { SidebarProps, SidebarItem } from "./Sidebar";
+export type {
+  SidebarItem,
+  SidebarSection,
+  SidebarProps,
+} from "./Sidebar";

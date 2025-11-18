@@ -19,7 +19,7 @@ router = APIRouter(prefix="/pmwo", tags=["pmwo"])
 @router.get("/", response_model=List[Dict[str, Any]])
 def list_pmwo(
     db: Session = Depends(get_db),
-    limit: int = Query(100, ge=1, le=10000),
+    limit: int = Query(10000, ge=1, le=10000),
     offset: int = Query(0, ge=0),
 ) -> List[Dict[str, Any]]:
     """

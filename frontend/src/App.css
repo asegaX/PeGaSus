@@ -1,0 +1,112 @@
+/**
+ * Fichier : frontend/src/App.css
+ *
+ * Styles transverses à l'application.
+ *
+ * Ce fichier contient notamment :
+ * - la présentation du pied de sidebar (SidebarFooter) ;
+ * - des classes globales liées à la structure définie dans App.tsx ;
+ * - il ne touche pas aux composants génériques (Navbar, Sidebar, DataTable),
+ *   dont le style est géré dans leurs propres modules.
+ *
+ * Convention de nommage :
+ * -----------------------
+ * - préfixe `app-` pour les classes associées au layout global ;
+ * - composant SidebarFooter :
+ *   - `.app-sidebar-footer`
+ *   - `.app-sidebar-footer__version`
+ *   - `.app-sidebar-footer__version-number`
+ *   - `.app-sidebar-footer__beta-badge`
+ *   - `.app-sidebar-footer__backend-status`
+ *   - `.app-sidebar-footer__status-dot`
+ *   - `.app-sidebar-footer__status-text`
+ */
+
+/* -------------------------------------------------------------------------- */
+/* SidebarFooter : bloc version + statut backend                              */
+/* -------------------------------------------------------------------------- */
+
+/**
+ * Conteneur principal du pied de sidebar.
+ *
+ * Rôle :
+ * ------
+ * - empiler verticalement la zone version et la zone de statut backend ;
+ * - assurer un spacing cohérent avec le reste de la sidebar.
+ */
+.app-sidebar-footer {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  width: 100%;
+}
+
+/**
+ * Ligne "version de l'application".
+ *
+ * Rôle :
+ * ------
+ * - aligner le numéro de version et le badge "Bêta" sur la même ligne ;
+ * - gérer un léger espace entre les deux éléments.
+ */
+.app-sidebar-footer__version {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+/** Numéro de version (ex : v0.1.0). */
+.app-sidebar-footer__version-number {
+  font-weight: 500;
+}
+
+/**
+ * Badge "Bêta".
+ *
+ * Rôle :
+ * ------
+ * - attirer légèrement l'œil sans être trop intrusif ;
+ * - cohérent avec la charte (bleu Pegasus / HTS).
+ */
+.app-sidebar-footer__beta-badge {
+  font-size: 0.7rem;
+  padding: 0.1rem 0.4rem;
+  border-radius: 999px;
+  background-color: rgba(37, 99, 235, 0.08);
+  color: #2563eb;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+/**
+ * Ligne "statut backend".
+ *
+ * Rôle :
+ * ------
+ * - aligner le point de statut et le texte sur la même ligne ;
+ * - offrir un rendu compact et lisible.
+ */
+.app-sidebar-footer__backend-status {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+}
+
+/**
+ * Point de statut du backend :
+ * - vert pour "connecté" ;
+ * - pourra évoluer en orange/rouge pour d'autres états.
+ */
+.app-sidebar-footer__status-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 999px;
+  background-color: #22c55e;
+}
+
+/** Texte accompagnant le point de statut backend. */
+.app-sidebar-footer__status-text {
+  font-size: 0.8rem;
+  color: #6b7280;
+}

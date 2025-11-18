@@ -1,0 +1,69 @@
+/**
+ * Fichier : frontend/src/layouts/MainLayout.css
+ *
+ * Feuille de styles dédiée au layout principal `MainLayout`.
+ *
+ * Objectifs UI / UX :
+ * -------------------
+ * - fournir un cadre cohérent pour toutes les pages :
+ *   - fond gris clair global ;
+ *   - navbar collée en haut (gérée par le composant Navbar) ;
+ *   - zone centrale avec une barre latérale gauche + contenu principal ;
+ * - offrir une transition fluide lors du repli/dépli de la sidebar ;
+ * - garantir une bonne lisibilité du contenu (padding, largeur, scroll).
+ *
+ * Convention :
+ * ------------
+ * - toutes les classes sont préfixées par `mainlayout-` pour éviter
+ *   les collisions avec d’autres composants.
+ */
+
+/* Racine du layout (fond global + colonne verticale) */
+.mainlayout-root {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  background-color: #f3f4f6; /* gris clair cohérent avec le reste de l’app */
+}
+
+/* Zone centrale : sidebar + contenu */
+.mainlayout-body {
+  display: flex;
+  flex: 1;
+  width: 100%;
+  align-items: stretch;
+}
+
+/**
+ * Colonne de gauche : conteneur de la barre latérale
+ *
+ * - la largeur est contrôlée par le style inline `width: ...px`
+ *   dans MainLayout.tsx (en fonction de isSidebarCollapsed) ;
+ * - ce bloc gère :
+ *   - la bordure verticale,
+ *   - le fond clair,
+ *   - le padding interne.
+ */
+.mainlayout-sidebar {
+  border-right: 1px solid #e5e7eb;
+  padding: 16px;
+  box-sizing: border-box;
+  background-color: #f9fafb;
+  display: flex;
+  /* transition fluide de la largeur lors du repli/dépli */
+  transition: width 140ms ease-out;
+}
+
+/**
+ * Zone principale : contenu de page
+ *
+ * - occupe tout l’espace horizontal restant (flex: 1) ;
+ * - applique un padding confortable pour les tableaux et cartes ;
+ * - laisse le scroll vertical au document (navbar sticky gérée ailleurs).
+ */
+.mainlayout-main {
+  flex: 1;
+  padding: 24px;
+  box-sizing: border-box;
+  min-width: 0; /* évite les débordements côté tableaux larges */
+}

@@ -3,96 +3,140 @@
  *
  * Composant de barre latérale (sidebar) réutilisable.
  *
- * Ce composant affiche :
- * - un en-tête compact (sous-titre + bouton de repli/dépli) ;
- * - une liste d'éléments de navigation avec icône ;
- * - un pied de sidebar optionnel (footer).
+ * Rôle :
+ * ------
+ * - proposer une navigation verticale avec :
+ *   - un en-tête (sous-titre + bouton de repli/dépli global) ;
+ *   - une ou plusieurs sections nommées (Dashboard, Tables exposées, …)
+ *     contenant chacune une liste d’éléments de menu ;
+ *   - un pied de page optionnel (version, statut backend, etc.) ;
+ * - gérer deux niveaux de repli :
+ *   - repli global de la sidebar (mode compact : icônes seules) ;
+ *   - repli / dépli des sections (dropdown) en mode étendu.
  *
- * Fonctionnalités :
- * - mode étendu : icône + libellé (et description éventuelle) ;
- * - mode compact (collapsed) : seules les icônes sont visibles ;
- * - bouton premium de repli/dépli placé en haut, toujours visible.
- *
- * Design :
- * - fond clair, cohérent avec la navbar ;
- * - item actif en dégradé bleu ;
- * - micro-effets au survol ;
- * - typographie Inter pour un rendu moderne.
+ * Design & implémentation :
+ * -------------------------
+ * - toute la mise en forme visuelle est déportée dans `Sidebar.css`
+ *   (fonds, survol, état actif, typographie, espacements, etc.) ;
+ * - ce fichier TSX se concentre uniquement sur :
+ *   - la structure DOM,
+ *   - la logique de sélection,
+ *   - la logique de repli/dépli des sections.
  */
 
 import React, { type ReactNode, useState } from "react";
+import "./Sidebar.css";
 
 /**
  * Type SidebarItem
  *
  * Représente un élément cliquable dans la barre latérale.
+ */
+export type SidebarItem = {
+  /**
+   * Identifiant unique de l’élément (utilisé pour la sélection).
+   */
+  id: string;
+
+  /**
+   * Libellé affiché pour cet élément.
+   */
+  label: string;
+
+  /**
+   * Description optionnelle, affichée sous le label en mode étendu.
+   */
+  description?: string;
+
+  /**
+   * Icône affichée à gauche du label.
+   * Idéalement, l’icône doit utiliser `stroke="currentColor"` ou `fill="currentColor"`
+   * pour s’intégrer automatiquement au thème couleur.
+   */
+  icon?: ReactNode;
+};
+
+/**
+ * Type SidebarSection
+ *
+ * Représente une section de la barre latérale (ex. : "Dashboard",
+ * "Tables exposées") qui contient une liste d’éléments de menu.
  *
  * Attributs
  * ---------
- * id : string
- *   Identifiant unique (utilisé pour la sélection).
- * label : string
- *   Libellé affiché pour cet élément.
- * description : string | undefined
- *   Description optionnelle, affichée sous le label en mode étendu.
- * icon : ReactNode | undefined
- *   Icône affichée à gauche du label. Elle doit idéalement utiliser
- *   la couleur courante (stroke="currentColor") pour s'intégrer au thème.
+ * id    : string
+ *   Identifiant logique de la section (utilisé pour le repli/dépli).
+ * title : string
+ *   Titre affiché au-dessus de la liste d’items.
+ * items : SidebarItem[]
+ *   Liste d’items appartenant à cette section.
  */
-export type SidebarItem = {
+export type SidebarSection = {
   id: string;
-  label: string;
-  description?: string;
-  icon?: ReactNode;
+  title: string;
+  items: SidebarItem[];
 };
 
 /**
  * Type SidebarProps
  *
- * Propriétés du composant Sidebar.
+ * Propriétés publiques du composant Sidebar.
  *
- * Attributs
- * ---------
- * subtitle : string | undefined
- *   Sous-titre compact affiché en haut (ex : "Tables exposées").
- * items : SidebarItem[]
- *   Liste des éléments de navigation à afficher.
- * selectedId : string | undefined
- *   Identifiant de l'élément actuellement sélectionné.
- * onSelectItem : (id: string) => void | undefined
- *   Callback déclenché lorsqu'un élément est cliqué.
- * footer : ReactNode | undefined
- *   Contenu optionnel affiché en bas de la sidebar (ex : version, statut backend).
- * collapsed : boolean | undefined
- *   Indique si la barre latérale est en mode compact (icônes seules).
- * onToggleCollapse : () => void | undefined
- *   Callback déclenché lorsqu'on clique sur le bouton de repli / dépli.
+ * Deux modes d’utilisation :
+ * --------------------------
+ * 1) Mode simple (héritage / rétrocompatibilité) :
+ *    - on fournit `items` (sans sections) ;
+ * 2) Mode structuré par sections (recommandé) :
+ *    - on fournit `sections` (Dashboard, Tables exposées, …).
+ *
+ * Si `sections` est renseigné, `items` est ignoré.
  */
 export type SidebarProps = {
+  /**
+   * Sous-titre compact affiché en haut (ex : "Navigation").
+   */
   subtitle?: string;
-  items: SidebarItem[];
+
+  /**
+   * Liste des éléments de navigation à afficher (mode simple).
+   */
+  items?: SidebarItem[];
+
+  /**
+   * Liste de sections nommées contenant chacune des items de navigation.
+   */
+  sections?: SidebarSection[];
+
+  /**
+   * Identifiant de l’élément actuellement sélectionné.
+   */
   selectedId?: string;
+
+  /**
+   * Callback déclenché lorsqu’un élément est cliqué.
+   */
   onSelectItem?: (id: string) => void;
+
+  /**
+   * Contenu optionnel affiché en bas de la sidebar (ex : version, statut backend).
+   */
   footer?: ReactNode;
+
+  /**
+   * Indique si la barre latérale est en mode compact (icônes seules).
+   */
   collapsed?: boolean;
+
+  /**
+   * Callback déclenché lorsqu’on clique sur le bouton de repli / dépli global.
+   */
   onToggleCollapse?: () => void;
 };
 
 /**
  * Type SidebarButtonProps
  *
- * Propriétés utilisées pour rendre un élément de menu dans la sidebar.
- *
- * Attributs
- * ---------
- * item : SidebarItem
- *   Élément de navigation à afficher.
- * isActive : boolean
- *   Indique si l'élément correspond à la sélection courante.
- * collapsed : boolean
- *   Indique si la barre latérale est en mode compact.
- * onClick : () => void
- *   Callback invoqué lors du clic sur le bouton.
+ * Propriétés utilisées pour rendre visuellement un élément de menu.
  */
 type SidebarButtonProps = {
   item: SidebarItem;
@@ -104,13 +148,10 @@ type SidebarButtonProps = {
 /**
  * Composant SidebarButton
  *
- * Représente visuellement un élément de navigation dans la sidebar.
- * Gère les états normal, survolé et actif avec des styles premium :
- * - dégradé bleu pour l'élément actif ;
- * - ombre légère ;
- * - translation subtile au survol.
- *
- * En mode "collapsed", seules les icônes sont affichées et centrées.
+ * Représente un item de navigation :
+ * - gère l’icône, le label et la description éventuelle ;
+ * - applique des classes CSS pour les états normal / survol / actif ;
+ * - supporte le mode compact (icône seule centrée).
  */
 const SidebarButton: React.FC<SidebarButtonProps> = ({
   item,
@@ -118,83 +159,26 @@ const SidebarButton: React.FC<SidebarButtonProps> = ({
   collapsed,
   onClick,
 }) => {
-  const [hovered, setHovered] = useState(false);
-
-  const background = isActive
-    ? "linear-gradient(90deg, #1d4ed8 0%, #2563eb 50%, #3b82f6 100%)"
-    : hovered
-    ? "rgba(229,231,235,0.85)"
-    : "transparent";
-
-  const labelColor = isActive ? "#f9fafb" : "#111827";
-  const descriptionColor = isActive ? "#e5e7eb" : "#6b7280";
-  const iconColor = isActive ? "#eff6ff" : hovered ? "#374151" : "#6b7280";
+  const buttonClassName = [
+    "sidebar-button",
+    isActive ? "sidebar-button--active" : "",
+    collapsed ? "sidebar-button--collapsed" : "",
+  ]
+    .filter(Boolean)
+    .join(" ");
 
   return (
-    <button
-      type="button"
-      onClick={onClick}
-      onMouseEnter={() => setHovered(true)}
-      onMouseLeave={() => setHovered(false)}
-      style={{
-        width: "100%",
-        textAlign: collapsed ? "center" : "left",
-        padding: collapsed ? "0.45rem 0.4rem" : "0.45rem 0.8rem",
-        borderRadius: "0.6rem",
-        border: "none",
-        cursor: "pointer",
-        background,
-        boxShadow: isActive
-          ? "0 0 0 1px rgba(37,99,235,0.35)"
-          : "0 0 0 1px transparent",
-        transition:
-          "background 140ms ease, box-shadow 140ms ease, transform 80ms ease",
-        transform: hovered && !isActive ? "translateY(-1px)" : "none",
-        fontFamily:
-          '"Inter", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif',
-      }}
-    >
-      <div
-        style={{
-          display: "flex",
-          alignItems: "center",
-          justifyContent: collapsed ? "center" : "flex-start",
-          gap: collapsed ? 0 : 8,
-        }}
-      >
+    <button type="button" onClick={onClick} className={buttonClassName}>
+      <div className="sidebar-button-inner">
         {item.icon && (
-          <span
-            style={{
-              display: "inline-flex",
-              alignItems: "center",
-              justifyContent: "center",
-              width: collapsed ? 24 : 20,
-              height: collapsed ? 24 : 20,
-              color: iconColor,
-            }}
-          >
-            {item.icon}
-          </span>
+          <span className="sidebar-button-icon">{item.icon}</span>
         )}
 
         {!collapsed && (
-          <div style={{ display: "flex", flexDirection: "column" }}>
-            <span
-              style={{
-                fontWeight: isActive ? 600 : 500,
-                fontSize: "0.9rem",
-                color: labelColor,
-              }}
-            >
-              {item.label}
-            </span>
+          <div className="sidebar-button-text">
+            <span className="sidebar-button-label">{item.label}</span>
             {item.description && (
-              <span
-                style={{
-                  fontSize: "0.75rem",
-                  color: descriptionColor,
-                }}
-              >
+              <span className="sidebar-button-description">
                 {item.description}
               </span>
             )}
@@ -208,16 +192,7 @@ const SidebarButton: React.FC<SidebarButtonProps> = ({
 /**
  * Type SidebarHeaderProps
  *
- * Propriétés du composant d'en-tête de la sidebar.
- *
- * Attributs
- * ---------
- * subtitle : string | undefined
- *   Sous-titre à afficher (ex : "Tables exposées").
- * collapsed : boolean
- *   Indique si le sidebar est en mode compact.
- * onToggleCollapse : () => void | undefined
- *   Callback déclenché lors du clic sur le bouton de repli / dépli.
+ * Propriétés du composant d’en-tête de la sidebar.
  */
 type SidebarHeaderProps = {
   subtitle?: string;
@@ -228,10 +203,12 @@ type SidebarHeaderProps = {
 /**
  * Composant SidebarHeader
  *
- * Affiche le sous-titre (si présent) et un bouton rond permettant
- * de réduire ou d'étendre la barre latérale. Le bouton reste visible
- * même lorsque le sidebar est replié pour permettre à l'utilisateur
- * de revenir facilement en mode étendu.
+ * Affiche :
+ * - le sous-titre (en mode étendu uniquement) ;
+ * - le bouton rond permettant de réduire ou d’étendre la barre latérale.
+ *
+ * Le bouton reste visible même lorsque la sidebar est repliée, pour permettre
+ * à l’utilisateur de revenir facilement en mode étendu.
  */
 const SidebarHeader: React.FC<SidebarHeaderProps> = ({
   subtitle,
@@ -240,29 +217,17 @@ const SidebarHeader: React.FC<SidebarHeaderProps> = ({
 }) => {
   const label = collapsed ? "Déplier le menu" : "Réduire le menu";
 
+  const headerClassName = [
+    "sidebar-header",
+    collapsed ? "sidebar-header--collapsed" : "",
+  ]
+    .filter(Boolean)
+    .join(" ");
+
   return (
-    <div
-      style={{
-        marginBottom: collapsed ? "0.75rem" : "0.5rem",
-        width: "100%",
-        display: "flex",
-        alignItems: "center",
-        justifyContent: collapsed ? "center" : "space-between",
-      }}
-    >
+    <div className={headerClassName}>
       {!collapsed && subtitle && (
-        <p
-          style={{
-            fontSize: "0.75rem",
-            textTransform: "uppercase",
-            letterSpacing: "0.08em",
-            color: "#9ca3af",
-            margin: 0,
-            fontWeight: 500,
-          }}
-        >
-          {subtitle}
-        </p>
+        <p className="sidebar-subtitle">{subtitle}</p>
       )}
 
       {onToggleCollapse && (
@@ -271,17 +236,7 @@ const SidebarHeader: React.FC<SidebarHeaderProps> = ({
           onClick={onToggleCollapse}
           aria-label={label}
           title={label}
-          style={{
-            borderRadius: "999px",
-            border: "1px solid #e5e7eb",
-            backgroundColor: "#ffffff",
-            padding: "0.2rem",
-            cursor: "pointer",
-            display: "inline-flex",
-            alignItems: "center",
-            justifyContent: "center",
-            boxShadow: "0 1px 2px rgba(15,23,42,0.08)",
-          }}
+          className="sidebar-toggle-btn"
         >
           <svg
             width="16"
@@ -293,8 +248,8 @@ const SidebarHeader: React.FC<SidebarHeaderProps> = ({
             <path
               d={
                 collapsed
-                  ? "M10 7l5 5-5 5" // chevron droit
-                  : "M14 7l-5 5 5 5" // chevron gauche
+                  ? "M10 7l5 5-5 5" // chevron droit (dépli)
+                  : "M14 7l-5 5 5 5" // chevron gauche (repli)
               }
               stroke="#4b5563"
               strokeWidth={1.8}
@@ -313,77 +268,181 @@ const SidebarHeader: React.FC<SidebarHeaderProps> = ({
  *
  * Conteneur principal de la barre latérale :
  * - affiche un en-tête compact (sous-titre + bouton de repli) ;
- * - liste les éléments de navigation ;
- * - propose un pied de sidebar optionnel.
+ * - rend soit une liste simple d’items, soit plusieurs sections ;
+ * - propose un pied de sidebar optionnel (footer) en mode étendu ;
+ * - gère le repli/dépli des sections comme des dropdowns.
  *
  * En mode "collapsed", seules les icônes sont visibles :
- * - le footer est masqué pour conserver un rendu épuré ;
- * - le bouton de repli/dépli reste visible en haut.
+ * - les titres de sections sont masqués ;
+ * - le repli des sections est ignoré (on affiche toujours les icônes).
  */
 const Sidebar: React.FC<SidebarProps> = ({
   subtitle,
   items,
+  sections,
   selectedId,
   onSelectItem,
   footer,
   collapsed = false,
   onToggleCollapse,
 }) => {
+  const usesSections = Array.isArray(sections) && sections.length > 0;
+
+  /**
+   * openSections
+   *
+   * Dictionnaire { sectionId → bool } indiquant si chaque section
+   * est actuellement ouverte (true) ou repliée (false).
+   *
+   * Initialisation : toutes les sections sont ouvertes.
+   */
+  const [openSections, setOpenSections] = useState<Record<string, boolean>>(
+    () => {
+      const initial: Record<string, boolean> = {};
+      if (sections) {
+        for (const section of sections) {
+          initial[section.id] = true;
+        }
+      }
+      return initial;
+    },
+  );
+
+  const rootClassName = [
+    "sidebar-root",
+    collapsed ? "sidebar-root--collapsed" : "",
+  ]
+    .filter(Boolean)
+    .join(" ");
+
+  const listBaseClassName = [
+    "sidebar-list",
+    collapsed ? "sidebar-list--collapsed" : "",
+  ]
+    .filter(Boolean)
+    .join(" ");
+
+  /**
+   * Gère le clic sur le header d’une section (dropdown).
+   * En mode collapsed, on ignore ce comportement (pas de dropdown).
+   */
+  const toggleSection = (sectionId: string) => {
+    if (collapsed) return;
+
+    setOpenSections((previous) => ({
+      ...previous,
+      [sectionId]: !previous[sectionId],
+    }));
+  };
+
+  /**
+   * Rend une liste d’items (utilisée à la fois en mode simple
+   * et dans chaque section).
+   */
+  const renderItemList = (itemsToRender: SidebarItem[]) => (
+    <ul className={listBaseClassName}>
+      {itemsToRender.map((item) => (
+        <li key={item.id} className="sidebar-list-item">
+          <SidebarButton
+            item={item}
+            isActive={item.id === selectedId}
+            collapsed={collapsed}
+            onClick={() => onSelectItem?.(item.id)}
+          />
+        </li>
+      ))}
+    </ul>
+  );
+
   return (
-    <div
-      style={{
-        display: "flex",
-        flexDirection: "column",
-        height: "100%",
-        width: "100%",
-        alignItems: collapsed ? "center" : "stretch",
-      }}
-    >
-      {/* En-tête : sous-titre + bouton de repli/dépli */}
+    <div className={rootClassName}>
+      {/* En-tête : sous-titre + bouton de repli/dépli global */}
       <SidebarHeader
         subtitle={subtitle}
         collapsed={collapsed}
         onToggleCollapse={onToggleCollapse}
       />
 
-      {/* Liste des éléments */}
-      <nav style={{ flex: 1, width: "100%" }}>
-        <ul
-          style={{
-            listStyle: "none",
-            padding: 0,
-            margin: 0,
-            display: "flex",
-            flexDirection: "column",
-            gap: "0.2rem",
-            alignItems: collapsed ? "center" : "stretch",
-          }}
-        >
-          {items.map((item) => (
-            <li key={item.id} style={{ width: "100%" }}>
-              <SidebarButton
-                item={item}
-                isActive={item.id === selectedId}
-                collapsed={collapsed}
-                onClick={() => onSelectItem?.(item.id)}
-              />
-            </li>
-          ))}
-        </ul>
+      {/* Zone de navigation */}
+      <nav className="sidebar-nav">
+        {usesSections ? (
+          <div className="sidebar-sections">
+            {sections!.map((section) => {
+              const isCollapsedSection =
+                !collapsed && openSections[section.id] === false;
+
+              const sectionClassName = [
+                "sidebar-section",
+                isCollapsedSection ? "sidebar-section--collapsed" : "sidebar-section--open",
+              ]
+                .filter(Boolean)
+                .join(" ");
+
+              const chevronClassName = [
+                "sidebar-section-header-chevron",
+                isCollapsedSection
+                  ? "sidebar-section-header-chevron--collapsed"
+                  : "",
+              ]
+                .filter(Boolean)
+                .join(" ");
+
+              return (
+                <section key={section.id} className={sectionClassName}>
+                  {/* Header de section = dropdown */}
+                  <button
+                    type="button"
+                    className="sidebar-section-header"
+                    onClick={() => toggleSection(section.id)}
+                    aria-expanded={isCollapsedSection ? "false" : "true"}
+                    // En mode collapsed, le header reste affiché
+                    // visuellement mais le clic n’a pas d’effet.
+                    disabled={collapsed}
+                  >
+                    <span className="sidebar-section-title">
+                      {section.title}
+                    </span>
+                    <span className={chevronClassName} aria-hidden="true">
+                      <svg
+                        width="14"
+                        height="14"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                      >
+                        <path
+                          d="M8 10l4 4 4-4"
+                          stroke="currentColor"
+                          strokeWidth={1.8}
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                        />
+                      </svg>
+                    </span>
+                  </button>
+
+                  {/* Liste des items de la section */}
+                  <div
+                    className={
+                      "sidebar-section-list-wrapper" +
+                      (isCollapsedSection
+                        ? " sidebar-section-list-wrapper--collapsed"
+                        : "")
+                    }
+                  >
+                    {renderItemList(section.items)}
+                  </div>
+                </section>
+              );
+            })}
+          </div>
+        ) : (
+          items && items.length > 0 && renderItemList(items)
+        )}
       </nav>
 
       {/* Footer en mode étendu uniquement */}
       {footer && !collapsed && (
-        <div
-          style={{
-            marginTop: "0.75rem",
-            width: "100%",
-            fontSize: "0.75rem",
-            color: "#9ca3af",
-          }}
-        >
-          {footer}
-        </div>
+        <div className="sidebar-footer">{footer}</div>
       )}
     </div>
   );

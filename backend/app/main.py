@@ -11,6 +11,7 @@ Ce module :
 """
 
 from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
 
 from app.core.config import settings
 from app.api.v1 import routes_sites, routes_trb, routes_pmwo, routes_swo
@@ -21,6 +22,19 @@ app = FastAPI(
     description="API de gestion des infrastructures passives (Pegasus).",
 )
 
+# Configuration CORS : autoriser le frontend Vite sur http://localhost:5173
+# À adapter plus tard pour les environnements staging / production.
+origins = [
+    "http://localhost:5173",
+]
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=origins,         # Origines autorisées
+    allow_credentials=True,
+    allow_methods=["*"],           # Méthodes HTTP autorisées
+    allow_headers=["*"],           # En-têtes HTTP autorisés
+)
 
 @app.get("/", tags=["health"])
 def read_root() -> dict:

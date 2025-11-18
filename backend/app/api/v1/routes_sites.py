@@ -27,7 +27,7 @@ router = APIRouter(prefix="/sites", tags=["sites"])
 @router.get("/", response_model=List[Dict[str, Any]])
 def list_sites(
     db: Session = Depends(get_db),
-    limit: int = Query(100, ge=1, le=1000, description="Nombre maximum de lignes à retourner"),
+    limit: int = Query(1000, ge=1, le=1000, description="Nombre maximum de lignes à retourner"),
     offset: int = Query(0, ge=0, description="Décalage pour la pagination"),
 ) -> List[Dict[str, Any]]:
     """

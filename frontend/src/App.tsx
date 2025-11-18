@@ -1,24 +1,89 @@
 /**
  * Fichier : frontend/src/App.tsx
  *
- * Composant racine de l'application React.
+ * Point d'entrée principal de l'application côté frontend.
  *
- * Il assemble :
- * - la barre de navigation principale (Navbar) ;
- * - le layout (MainLayout) ;
- * - la barre latérale (Sidebar) ;
- * - le contenu central.
- *
- * Il gère également :
- * - l'état de la table actuellement sélectionnée ;
- * - l'état "collapsed" du sidebar (mode compact avec icônes seules).
+ * Rôle global :
+ * -------------
+ * - installe le router (react-router-dom) via un BrowserRouter ;
+ * - définit les routes principales :
+ *   - Home + tables : "/", "/sites", "/trb", "/pmwo", "/swo" ;
+ *   - dashboards : "/sla", "/daily", "/weekly", "/monthly", "/pendingswo" ;
+ * - applique un layout commun (Navbar + Sidebar + MainLayout) à l'ensemble
+ *   des pages grâce à un composant AppLayout et à l'Outlet ;
+ * - délègue le contenu central à des pages spécialisées (tables et dashboards).
  */
 
 import React, { useState } from "react";
+import {
+  BrowserRouter,
+  Routes,
+  Route,
+  Navigate,
+  Outlet,
+  useLocation,
+  useNavigate,
+} from "react-router-dom";
+
+import "./App.css";
+
 import MainLayout from "./layouts/MainLayout";
-import Sidebar, { type SidebarItem } from "./components/sidebar";
 import Navbar from "./components/navbar";
+import Sidebar, {
+  type SidebarItem,
+  type SidebarSection,
+} from "./components/sidebar";
 import logoBlanc from "./assets/logo_blanc.svg";
+
+import HomePage from "./pages/home/HomePage";
+import SitesPage from "./pages/sites/SitesPage";
+import TrbPage from "./pages/trb/TrbPage";
+import PmwoPage from "./pages/pmwo/PmwoPage";
+import SwoPage from "./pages/swo/SwoPage";
+
+import SlaPage from "./pages/sla/SlaPage";
+import DailyPage from "./pages/daily/DailyPage";
+import WeeklyPage from "./pages/weekly/WeeklyPage";
+import MonthlyPage from "./pages/monthly/MonthlyPage";
+import PendingSwoPage from "./pages/pendingswo/PendingSwoPage";
+
+/**
+ * Type TableId
+ *
+ * Identifiants possibles pour les tables exposées dans la barre latérale.
+ */
+type TableId = "sites" | "trb" | "pmwo" | "swo";
+
+/**
+ * Type DashboardId
+ *
+ * Identifiants possibles pour les dashboards de la barre latérale.
+ */
+type DashboardId =
+  | "sla"
+  | "daily"
+  | "weekly"
+  | "monthly"
+  | "pendingswo";
+
+/**
+ * Type NavId
+ *
+ * Réunion des identifiants de tables et de dashboards.
+ * Permet de typer fortement la sélection dans la sidebar.
+ */
+type NavId = TableId | DashboardId;
+
+/**
+ * Type NavSidebarItem
+ *
+ * Élargit SidebarItem avec une propriété `path` qui indique
+ * la route associée à l'élément (ex : "/sites", "/sla").
+ */
+type NavSidebarItem = SidebarItem & {
+  id: NavId;
+  path: string;
+};
 
 /**
  * Icône "Sites" : représentation d'un bâtiment / infrastructure.
@@ -121,46 +186,260 @@ const SwoIcon: React.FC = () => (
 );
 
 /**
+ * Icône "SLA" : jauge / indicateur de niveau de service.
+ */
+const SlaIcon: React.FC = () => (
+  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+    <circle
+      cx="12"
+      cy="12"
+      r="7"
+      stroke="currentColor"
+      strokeWidth={1.6}
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />
+    <path
+      d="M12 12l3-2"
+      stroke="currentColor"
+      strokeWidth={1.6}
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />
+    <path
+      d="M8 16a4.5 4.5 0 0 1 8 0"
+      stroke="currentColor"
+      strokeWidth={1.6}
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />
+  </svg>
+);
+
+/**
+ * Icône "Daily" : petit calendrier jour J.
+ */
+const DailyIcon: React.FC = () => (
+  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+    <rect
+      x="5"
+      y="6"
+      width="14"
+      height="13"
+      rx="2"
+      ry="2"
+      stroke="currentColor"
+      strokeWidth={1.6}
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />
+    <path
+      d="M9 4v4M15 4v4M5 10h14"
+      stroke="currentColor"
+      strokeWidth={1.6}
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />
+    <circle
+      cx="12"
+      cy="14"
+      r="1.4"
+      stroke="currentColor"
+      strokeWidth={1.4}
+    />
+  </svg>
+);
+
+/**
+ * Icône "Weekly" : calendrier avec barre hebdomadaire.
+ */
+const WeeklyIcon: React.FC = () => (
+  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+    <rect
+      x="5"
+      y="6"
+      width="14"
+      height="13"
+      rx="2"
+      ry="2"
+      stroke="currentColor"
+      strokeWidth={1.6}
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />
+    <path
+      d="M9 4v4M15 4v4M5 10h14"
+      stroke="currentColor"
+      strokeWidth={1.6}
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />
+    <path
+      d="M7.5 14h9"
+      stroke="currentColor"
+      strokeWidth={1.6}
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />
+  </svg>
+);
+
+/**
+ * Icône "Monthly" : calendrier avec grille mensuelle.
+ */
+const MonthlyIcon: React.FC = () => (
+  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+    <rect
+      x="5"
+      y="6"
+      width="14"
+      height="13"
+      rx="2"
+      ry="2"
+      stroke="currentColor"
+      strokeWidth={1.6}
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />
+    <path
+      d="M9 4v4M15 4v4M5 10h14"
+      stroke="currentColor"
+      strokeWidth={1.6}
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />
+    <path
+      d="M8 13h2M12 13h2M16 13h-2M8 16h2M12 16h2M16 16h-2"
+      stroke="currentColor"
+      strokeWidth={1.4}
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />
+  </svg>
+);
+
+/**
+ * Icône "Pending SWO" : document avec horloge (SWO en attente).
+ */
+const PendingSwoIcon: React.FC = () => (
+  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+    <path
+      d="M8 4h7l4 4v12H8V4Z"
+      stroke="currentColor"
+      strokeWidth={1.6}
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />
+    <path
+      d="M15 4v4h4"
+      stroke="currentColor"
+      strokeWidth={1.6}
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />
+    <circle
+      cx="11"
+      cy="15"
+      r="3"
+      stroke="currentColor"
+      strokeWidth={1.6}
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />
+    <path
+      d="M11 14v1.2l0.9 0.9"
+      stroke="currentColor"
+      strokeWidth={1.6}
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />
+  </svg>
+);
+
+/**
+ * Constantes de navigation : Dashboard
+ *
+ * Chaque élément :
+ * - id    : identifiant logique (NavId) ;
+ * - label : texte affiché ;
+ * - icon  : icône SVG ;
+ * - path  : route associée ("/sla", "/daily", etc.).
+ */
+const NAV_DASHBOARD_ITEMS: NavSidebarItem[] = [
+  { id: "sla",        label: "SLA",          icon: <SlaIcon />,        path: "/sla" },
+  { id: "daily",      label: "Daily",        icon: <DailyIcon />,      path: "/daily" },
+  { id: "weekly",     label: "Weekly",       icon: <WeeklyIcon />,     path: "/weekly" },
+  { id: "monthly",    label: "Monthly",      icon: <MonthlyIcon />,    path: "/monthly" },
+  { id: "pendingswo", label: "Pending SWO",  icon: <PendingSwoIcon />, path: "/pendingswo" },
+];
+
+
+/**
+ * Constantes de navigation : Tables exposées
+ */
+const NAV_TABLE_ITEMS: NavSidebarItem[] = [
+  { id: "sites", label: "Sites", icon: <SitesIcon />, path: "/sites" },
+  { id: "trb", label: "TRB", icon: <TrbIcon />, path: "/trb" },
+  { id: "pmwo", label: "PMWO", icon: <PmwoIcon />, path: "/pmwo" },
+  { id: "swo", label: "SWO", icon: <SwoIcon />, path: "/swo" },
+];
+
+/**
+ * Liste complète de tous les items de navigation (Dashboard + Tables).
+ *
+ * Utilisée pour :
+ * - retrouver un item à partir de son `id` (navigation au clic) ;
+ * - déduire l’item sélectionné à partir du `pathname`.
+ */
+const ALL_NAV_ITEMS: NavSidebarItem[] = [
+  ...NAV_DASHBOARD_ITEMS,
+  ...NAV_TABLE_ITEMS,
+];
+
+/**
+ * Fonction utilitaire getNavIdFromPath
+ *
+ * Permet de déduire l’élément de navigation actuellement sélectionné
+ * à partir du chemin d’URL (pathname).
+ *
+ * Exemple :
+ * ---------
+ * - "/sites"      → "sites"
+ * - "/trb"        → "trb"
+ * - "/pmwo"       → "pmwo"
+ * - "/swo"        → "swo"
+ * - "/sla"        → "sla"
+ * - "/daily"      → "daily"
+ * - "/weekly"     → "weekly"
+ * - "/monthly"    → "monthly"
+ * - "/pendingswo" → "pendingswo"
+ */
+function getNavIdFromPath(pathname: string): NavId | undefined {
+  const cleaned = pathname.replace(/\/+$/, "") || "/";
+  const match = ALL_NAV_ITEMS.find((item) => item.path === cleaned);
+  return match?.id;
+}
+
+/**
  * Composant SidebarFooter
  *
  * Affiche en bas de la sidebar :
  * - la version de l'application avec un badge "Bêta" ;
  * - un indicateur de statut backend (statique pour l'instant).
  *
- * Ce composant peut facilement évoluer plus tard pour intégrer
- * un vrai check de santé du backend.
+ * La présentation (couleurs, alignement) est gérée dans App.css.
  */
 const SidebarFooter: React.FC = () => {
   return (
-    <div style={{ display: "flex", flexDirection: "column", gap: "0.35rem" }}>
-      <div style={{ display: "flex", alignItems: "center", gap: "0.4rem" }}>
-        <span style={{ fontWeight: 500 }}>v0.1.0</span>
-        <span
-          style={{
-            fontSize: "0.7rem",
-            padding: "0.1rem 0.4rem",
-            borderRadius: "999px",
-            backgroundColor: "rgba(37,99,235,0.08)",
-            color: "#2563eb",
-            fontWeight: 600,
-            textTransform: "uppercase",
-            letterSpacing: "0.06em",
-          }}
-        >
-          Bêta
-        </span>
+    <div className="app-sidebar-footer">
+      <div className="app-sidebar-footer__version">
+        <span className="app-sidebar-footer__version-number">v0.1.0</span>
+        <span className="app-sidebar-footer__beta-badge">Bêta</span>
       </div>
 
-      <div style={{ display: "flex", alignItems: "center", gap: "0.35rem" }}>
-        <span
-          style={{
-            width: "8px",
-            height: "8px",
-            borderRadius: "999px",
-            backgroundColor: "#22c55e", // vert "online"
-          }}
-        />
-        <span style={{ fontSize: "0.8rem", color: "#6b7280" }}>
+      <div className="app-sidebar-footer__backend-status">
+        <span className="app-sidebar-footer__status-dot" />
+        <span className="app-sidebar-footer__status-text">
           Backend Pegasus : connecté
         </span>
       </div>
@@ -169,23 +448,33 @@ const SidebarFooter: React.FC = () => {
 };
 
 /**
- * Liste des tables disponibles dans la barre latérale.
- */
-const TABLES: SidebarItem[] = [
-  { id: "sites", label: "Sites", icon: <SitesIcon /> },
-  { id: "trb", label: "TRB", icon: <TrbIcon /> },
-  { id: "pmwo", label: "PMWO", icon: <PmwoIcon /> },
-  { id: "swo", label: "SWO", icon: <SwoIcon /> },
-];
-
-/**
- * Composant App
+ * Composant AppLayout
  *
- * Gère la sélection de la table et l'état collapsed du sidebar.
+ * Layout applicatif commun à toutes les pages protégées :
+ * - affiche la Navbar en haut ;
+ * - affiche la Sidebar à gauche (avec deux sections : Dashboard + Tables exposées) ;
+ * - affiche la zone centrale via l'Outlet (HomePage, SitesPage, etc.) ;
+ * - gère le mode "collapsed" du sidebar.
  */
-const App: React.FC = () => {
-  const [selectedTableId, setSelectedTableId] = useState<string | undefined>();
+const AppLayout: React.FC = () => {
+  const location = useLocation();
+  const navigate = useNavigate();
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState<boolean>(false);
+
+  const selectedNavId = getNavIdFromPath(location.pathname);
+
+  const sections: SidebarSection[] = [
+    {
+      id: "dashboard",
+      title: "Dashboard",
+      items: NAV_DASHBOARD_ITEMS,
+    },
+    {
+      id: "tables",
+      title: "Raw Data",
+      items: NAV_TABLE_ITEMS,
+    },
+  ];
 
   return (
     <MainLayout
@@ -193,42 +482,76 @@ const App: React.FC = () => {
         <Navbar
           logoSrc={logoBlanc}
           logoHref="/"
-          // Navbar minimaliste : logo seul, cohérent avec la charte actuelle.
         />
       }
       sidebar={
         <Sidebar
-          subtitle="Tables exposées"
-          items={TABLES}
-          selectedId={selectedTableId}
-          onSelectItem={setSelectedTableId}
+          subtitle="Navigation"
+          sections={sections}
+          selectedId={selectedNavId}
+          onSelectItem={(id) => {
+            const target = ALL_NAV_ITEMS.find((item) => item.id === id);
+            if (target) {
+              navigate(target.path);
+            }
+          }}
           footer={<SidebarFooter />}
           collapsed={isSidebarCollapsed}
           onToggleCollapse={() =>
-            setIsSidebarCollapsed((prevCollapsed) => !prevCollapsed)
+            setIsSidebarCollapsed((previous) => !previous)
           }
         />
       }
       isSidebarCollapsed={isSidebarCollapsed}
     >
-      <section>
-        <h2 style={{ fontSize: "1.5rem", fontWeight: 600, marginBottom: "0.75rem" }}>
-          Tableau de bord des infrastructures passives
-        </h2>
-
-        {selectedTableId ? (
-          <p style={{ color: "#4b5563" }}>
-            La zone centrale affichera prochainement les données de la table{" "}
-            <strong>{selectedTableId}</strong> récupérées depuis l&apos;API FastAPI.
-          </p>
-        ) : (
-          <p style={{ color: "#6b7280" }}>
-            Sélectionne une table dans la barre latérale pour afficher ici son contenu
-            (données du backend Pegasus).
-          </p>
-        )}
-      </section>
+      {/* Zone centrale pilotée par le router (HomePage, tables, dashboards…) */}
+      <Outlet />
     </MainLayout>
+  );
+};
+
+/**
+ * Composant App
+ *
+ * Enveloppe l'application dans un BrowserRouter et déclare
+ * les routes principales avec un layout commun.
+ *
+ * Routes :
+ * --------
+ * - "/"           → HomePage
+ * - "/sites"      → SitesPage
+ * - "/trb"        → TrbPage
+ * - "/pmwo"       → PmwoPage
+ * - "/swo"        → SwoPage
+ * - "/sla"        → SlaPage
+ * - "/daily"      → DailyPage
+ * - "/weekly"     → WeeklyPage
+ * - "/monthly"    → MonthlyPage
+ * - "/pendingswo" → PendingSwoPage
+ * - "*"           → redirection vers "/"
+ */
+const App: React.FC = () => {
+  return (
+    <BrowserRouter>
+      <Routes>
+        <Route element={<AppLayout />}>
+          <Route path="/" element={<HomePage />} />
+          <Route path="/sites" element={<SitesPage />} />
+          <Route path="/trb" element={<TrbPage />} />
+          <Route path="/pmwo" element={<PmwoPage />} />
+          <Route path="/swo" element={<SwoPage />} />
+
+          {/* Dashboards (pages vides pour l'instant) */}
+          <Route path="/sla" element={<SlaPage />} />
+          <Route path="/daily" element={<DailyPage />} />
+          <Route path="/weekly" element={<WeeklyPage />} />
+          <Route path="/monthly" element={<MonthlyPage />} />
+          <Route path="/pendingswo" element={<PendingSwoPage />} />
+
+          <Route path="*" element={<Navigate to="/" replace />} />
+        </Route>
+      </Routes>
+    </BrowserRouter>
   );
 };
 

@@ -1,0 +1,304 @@
+/**
+ * Fichier : frontend/src/components/table/DataTable.css
+ *
+ * Feuille de styles dédiée au composant DataTable.
+ *
+ * Objectifs UI / UX :
+ * -------------------
+ * - proposer un tableau “premium” :
+ *   - en-tête clair, typographie moderne ;
+ *   - bandeau de table avec header sticky et zebra rows ;
+ *   - scroll interne vertical pour les gros volumes ;
+ *   - pagination lisible avec choix du nombre de lignes / page ;
+ *   - barre de recherche compacte, toujours alignée sur le header ;
+ * - conserver un design cohérent avec le reste de l’app (Navbar / Sidebar).
+ *
+ * Convention :
+ * ------------
+ * - toutes les classes sont préfixées par `datatable-` pour éviter
+ *   les collisions avec d’autres composants.
+ */
+
+/* Racine du composant */
+.datatable-root {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  font-family: "Inter", system-ui, -apple-system, BlinkMacSystemFont,
+    "Segoe UI", sans-serif;
+}
+
+/* --- Header (titre + actions) --- */
+
+.datatable-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+  padding-right: 0.75rem; /* léger retrait global à droite */
+}
+
+.datatable-header-left {
+  min-width: 0;
+  flex: 1 1 auto;
+  padding-left: 0.1rem;
+}
+
+.datatable-title {
+  font-size: 1.35rem;
+  font-weight: 600;
+  margin: 0;
+  color: #111827;
+}
+
+.datatable-subtitle {
+  margin: 0.25rem 0 0 0;
+  font-size: 0.85rem;
+  color: #6b7280;
+}
+
+/* Actions (bouton Actualiser + recherche) */
+.datatable-header-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  flex-shrink: 0;
+  margin-right: 1.75rem; /* pour rentrer dans la largeur visible */
+}
+
+/* Bouton Actualiser */
+.datatable-reload-btn {
+  font-size: 0.8rem;
+  border-radius: 999px;
+  border: 1px solid #e5e7eb;
+  background-color: #ffffff;
+  padding: 0.3rem 0.8rem;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  box-shadow: 0 1px 2px rgba(15, 23, 42, 0.05);
+  white-space: nowrap;
+}
+
+.datatable-reload-icon {
+  width: 14px;
+  height: 14px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Barre de recherche globale */
+.datatable-search {
+  position: relative;
+  width: 190px; /* largeur compacte pour ne pas dépasser à droite */
+}
+
+.datatable-search-icon {
+  position: absolute;
+  left: 9px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 16px;
+  height: 16px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: #9ca3af;
+}
+
+.datatable-search-input {
+  width: 100%;
+  padding: 0.3rem 0.8rem 0.3rem 1.9rem;
+  border-radius: 999px;
+  border: 1px solid #e5e7eb;
+  font-size: 0.8rem;
+  outline: none;
+  background-color: #f9fafb;
+}
+
+/* --- Messages d'erreur --- */
+
+.datatable-error {
+  border-radius: 0.5rem;
+  border: 1px solid rgba(239, 68, 68, 0.3);
+  background-color: rgba(254, 242, 242, 0.9);
+  padding: 0.5rem 0.75rem;
+  font-size: 0.85rem;
+  color: #991b1b;
+}
+
+/* --- Conteneur du tableau & états --- */
+
+.datatable-container {
+  border-radius: 0.75rem;
+  border: 1px solid #e5e7eb;
+  background-color: #ffffff;
+  box-shadow: 0 1px 3px rgba(15, 23, 42, 0.05);
+  overflow: hidden;
+}
+
+.datatable-state {
+  padding: 1.25rem;
+  font-size: 0.9rem;
+  color: #6b7280;
+}
+
+.datatable-state--loading,
+.datatable-state--empty,
+.datatable-state--noresult {
+  /* même style pour les différents états */
+}
+
+/* --- Table scrollable --- */
+
+.datatable-scroll-container {
+  overflow-x: auto;
+  max-height: calc(100vh - 180px);
+}
+
+.datatable-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.85rem;
+}
+
+/* Header sticky */
+.datatable-thead {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  background: linear-gradient(90deg, #f3f4f6 0%, #eef2ff 50%, #eff6ff 100%);
+}
+
+/* Cellules d'en-tête */
+.datatable-th {
+  text-align: left;
+  padding: 0.55rem 0.75rem;
+  border-bottom: 1px solid #e5e7eb;
+  color: #4b5563;
+  font-weight: 600;
+  white-space: nowrap;
+  cursor: pointer;
+  user-select: none;
+}
+
+.datatable-th-inner {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+.datatable-sort-indicator {
+  font-size: 0.7rem;
+  color: #6b7280;
+}
+
+/* Colonne Détail */
+.datatable-th--detail {
+  text-align: center;
+  width: 80px;
+}
+
+/* Lignes de tableau */
+.datatable-row--even {
+  background-color: #ffffff;
+}
+
+.datatable-row--odd {
+  background-color: #f9fafb;
+}
+
+/* Cellules */
+.datatable-td {
+  padding: 0.5rem 0.75rem;
+  border-bottom: 1px solid #f3f4f6;
+  color: #374151;
+  max-width: 260px;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  overflow: hidden;
+}
+
+.datatable-td--detail {
+  text-align: center;
+}
+
+/* Bouton oeil “Détail” */
+.datatable-detail-btn {
+  border: none;
+  background-color: transparent;
+  cursor: pointer;
+  border-radius: 999px;
+  width: 30px;
+  height: 30px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: #4b5563;
+}
+
+/* --- Footer / pagination --- */
+
+.datatable-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.55rem 0.75rem;
+  border-top: 1px solid #e5e7eb;
+  font-size: 0.8rem;
+  color: #6b7280;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+/* Choix nombre de lignes par page */
+.datatable-footer-pagesize {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  white-space: nowrap;
+}
+
+.datatable-pagesize-select {
+  border-radius: 999px;
+  border: 1px solid #e5e7eb;
+  padding: 0.15rem 0.6rem;
+  font-size: 0.8rem;
+  background-color: #ffffff;
+}
+
+/* Texte central : nombre total d’enregistrements */
+.datatable-footer-total {
+  flex-grow: 1;
+  text-align: center;
+}
+
+/* Zone pagination à droite */
+.datatable-footer-pagination {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  justify-content: flex-end;
+  white-space: nowrap;
+}
+
+.datatable-footer-pageinfo {
+  margin-right: 0.3rem;
+}
+
+/* Boutons de pages */
+.datatable-page-btn {
+  padding: 0.2rem 0.45rem;
+  border-radius: 999px;
+  border: 1px solid #e5e7eb;
+  background-color: #ffffff;
+  cursor: pointer;
+}
+
+.datatable-page-btn:disabled {
+  background-color: #f9fafb;
+  cursor: default;
+}

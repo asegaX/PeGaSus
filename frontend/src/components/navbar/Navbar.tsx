@@ -1,44 +1,53 @@
 /**
  * Fichier : frontend/src/components/navbar/Navbar.tsx
  *
- * Composant Navbar réutilisable.
+ * Composant de barre de navigation (“Navbar”) générique et réutilisable.
  *
- * Il affiche :
- * - un logo aligné complètement à gauche ;
- * - éventuellement un nom d'application et un sous-titre ;
- * - une zone à droite pour des actions (optionnelles).
+ * Rôle principal :
+ * ----------------
+ * - Afficher un bandeau supérieur avec :
+ *   - un logo aligné complètement à gauche (cliquable ou non) ;
+ *   - éventuellement un nom d'application et un sous-titre (tagline) ;
+ *   - une zone à droite pour des actions (boutons, menu utilisateur, etc.).
  *
- * Le composant est conçu pour être réutilisable dans d'autres applications :
- * - logo, texte et contenu à droite sont paramétrables ;
- * - on ne dépend pas d'une URL en dur (localhost, etc.).
+ * Points de conception :
+ * ----------------------
+ * - Aucun style inline : tout le design (gradient, sticky, paddings, etc.)
+ *   est géré dans `Navbar.css` via des classes CSS dédiées ;
+ * - Le composant ne dépend d’aucune URL en dur :
+ *   - le lien du logo est injecté via la prop `logoHref` ("/" par défaut) ;
+ *   - le logo lui-même est injecté via la prop `logoSrc` (asset du projet) ;
+ * - Accessibilité :
+ *   - l’attribut alt de l’image est systématiquement renseigné
+ *     (logoAlt > appName > "Application").
  */
 
 import React, { type ReactNode } from "react";
+import "./Navbar.css";
 
 export type NavbarProps = {
   /**
    * Source de l'image du logo (généralement importée depuis les assets du projet).
-   * Exemple : import logo from "../assets/logo_blanc.svg";
+   * Exemple : `import logo from "../assets/logo_blanc.svg";`
    */
   logoSrc: string;
 
   /**
    * URL vers laquelle rediriger lorsqu'on clique sur le logo.
    * Par défaut : "/" (racine de l'application).
-   * En dev, "/" correspond à http://localhost:5173/.
    */
   logoHref?: string;
 
   /**
    * Texte alternatif du logo pour l'accessibilité.
-   * Si non fourni, appName sera utilisé par défaut.
+   * Si non fourni, `appName` sera utilisé par défaut.
    */
   logoAlt?: string;
 
   /**
    * Nom de l'application affiché à côté du logo.
    * Exemple : "Pegasus Infra".
-   * Peut être laissé vide si l'on souhaite afficher uniquement le logo.
+   * Peut être laissé vide pour afficher uniquement le logo.
    */
   appName?: string;
 
@@ -57,12 +66,15 @@ export type NavbarProps = {
 /**
  * Composant Navbar
  *
- * @param logoSrc - URL du logo à afficher à gauche.
- * @param logoHref - URL de redirection au clic sur le logo.
- * @param logoAlt - Texte alternatif du logo.
- * @param appName - Nom de l'application.
- * @param tagline - Sous-titre / baseline de l'application.
- * @param rightContent - Contenu optionnel aligné à droite.
+ * @param logoSrc      URL du logo à afficher à gauche.
+ * @param logoHref     URL de redirection au clic sur le logo ("/" par défaut).
+ * @param logoAlt      Texte alternatif du logo (fallback : appName → "Application").
+ * @param appName      Nom de l'application (facultatif).
+ * @param tagline      Sous-titre / baseline de l'application (facultatif).
+ * @param rightContent Contenu optionnel aligné à droite (actions, menus, etc.).
+ *
+ * Le composant rend un élément `<header>` sticky en haut de la page, afin
+ * que la barre de navigation reste visible lors du scroll.
  */
 const Navbar: React.FC<NavbarProps> = ({
   logoSrc,
@@ -72,100 +84,40 @@ const Navbar: React.FC<NavbarProps> = ({
   tagline,
   rightContent,
 }) => {
+  // Texte alternatif utilisé par l'image du logo pour les lecteurs d'écran
   const effectiveAlt = logoAlt ?? appName ?? "Application";
 
+  // Bloc logo (cliquable si logoHref est défini)
+  const logoElement = (
+    <img
+      src={logoSrc}
+      alt={effectiveAlt}
+      className="navbar-logo-img"
+    />
+  );
+
   return (
-    <header
-      style={{
-        width: "100%",
-        boxSizing: "border-box",
-        padding: "0.75rem 2rem",
-        background:
-          "linear-gradient(90deg, rgba(15,23,42,1) 0%, rgba(30,64,175,1) 50%, rgba(37,99,235,1) 100%)",
-        color: "#f9fafb",
-        boxShadow: "0 2px 8px rgba(15,23,42,0.18)",
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "space-between",
-        position: "sticky",
-        top: 0,
-        zIndex: 20,
-      }}
-    >
+    <header className="navbar-root">
       {/* Bloc gauche : logo + éventuel texte d'application */}
-      <div style={{ display: "flex", alignItems: "center", gap: "0.75rem" }}>
-        {/* Logo cliquable si logoHref est défini */}
+      <div className="navbar-left">
         {logoHref ? (
-          <a
-            href={logoHref}
-            style={{
-              display: "inline-flex",
-              alignItems: "center",
-              textDecoration: "none",
-              cursor: "pointer",
-            }}
-          >
-            <img
-              src={logoSrc}
-              alt={effectiveAlt}
-              style={{
-                height: "32px",
-                width: "auto",
-                display: "block",
-              }}
-            />
+          <a href={logoHref} className="navbar-logo-link">
+            {logoElement}
           </a>
         ) : (
-          <img
-            src={logoSrc}
-            alt={effectiveAlt}
-            style={{
-              height: "32px",
-              width: "auto",
-              display: "block",
-            }}
-          />
+          logoElement
         )}
 
-        {/* Texte optionnel (tu l'as retiré pour l'instant, donc appName/tagline peuvent rester vides) */}
         {(appName || tagline) && (
-          <div style={{ display: "flex", flexDirection: "column" }}>
-            {appName && (
-              <span
-                style={{
-                  fontWeight: 600,
-                  fontSize: "1.1rem",
-                  letterSpacing: "0.03em",
-                }}
-              >
-                {appName}
-              </span>
-            )}
-            {tagline && (
-              <span
-                style={{
-                  fontSize: "0.75rem",
-                  opacity: 0.9,
-                }}
-              >
-                {tagline}
-              </span>
-            )}
+          <div className="navbar-text">
+            {appName && <span className="navbar-app-name">{appName}</span>}
+            {tagline && <span className="navbar-tagline">{tagline}</span>}
           </div>
         )}
       </div>
 
       {/* Bloc droit : contenu optionnel (actions, menu, etc.) */}
-      <div
-        style={{
-          display: "flex",
-          alignItems: "center",
-          gap: "0.75rem",
-          fontSize: "0.85rem",
-        }}
-      >
-        {rightContent}
-      </div>
+      <div className="navbar-right">{rightContent}</div>
     </header>
   );
 };

@@ -1,0 +1,35 @@
+/**
+ * Fichier : frontend/src/pages/SwoPage.css
+ *
+ * Styles dédiés à la page SWO (`SwoPage`).
+ *
+ * Objectifs :
+ * -----------
+ * - encadrer visuellement la section SWO dans le layout global ;
+ * - assurer un espacement cohérent entre la page SWO et les autres sections ;
+ * - rester minimaliste, car le rendu "premium" des tableaux et du modal
+ *   est déjà géré dans les composants génériques (DataTable, RecordDetailModal).
+ *
+ * Convention :
+ * ------------
+ * - toutes les classes spécifiques à cette page sont préfixées par `swo-page`.
+ */
+
+/**
+ * Conteneur principal de la page SWO.
+ *
+ * Rôle :
+ * ------
+ * - fournir une colonne verticale pour :
+ *   - le DataTable SWO ;
+ *   - le modal de détail (porté par React au même niveau).
+ * - appliquer un espacement vertical pour que la page ne soit pas collée
+ *   aux bords du layout principal (géré par MainLayout).
+ */
+.swo-page {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;           /* espace entre les blocs internes si on en ajoute plus tard */
+  width: 100%;
+  box-sizing: border-box;
+}

@@ -1,0 +1,91 @@
+/**
+ * Fichier : frontend/src/components/navbar/Navbar.css
+ *
+ * Feuille de styles dédiée au composant Navbar.
+ *
+ * Objectifs UX / UI :
+ * -------------------
+ * - Fournir un bandeau supérieur premium avec :
+ *   - un gradient sombre → bleu rappelant une application pro ;
+ *   - une ombre discrète pour détacher la barre du contenu ;
+ *   - un comportement sticky (toujours visible au scroll).
+ * - Garantir une mise en page robuste :
+ *   - logo et texte alignés à gauche,
+ *   - actions (rightContent) alignées à droite,
+ *   - gestion des espacements via flex + gap.
+ *
+ * Remarque :
+ * ----------
+ * Aucune règle globale n’est définie ici : toutes les classes sont
+ * préfixées `navbar-` pour limiter les risques de collision.
+ */
+
+/* Conteneur principal de la barre de navigation */
+.navbar-root {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 0.75rem 2rem;
+  background: linear-gradient(
+    90deg,
+    rgba(15, 23, 42, 1) 0%,
+    rgba(30, 64, 175, 1) 50%,
+    rgba(37, 99, 235, 1) 100%
+  );
+  color: #f9fafb;
+  box-shadow: 0 2px 8px rgba(15, 23, 42, 0.18);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  position: sticky;
+  top: 0;
+  z-index: 20;
+}
+
+/* Bloc gauche : logo + texte applicatif */
+.navbar-left {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+/* Lien entourant le logo (quand cliquable) */
+.navbar-logo-link {
+  display: inline-flex;
+  align-items: center;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+/* Image du logo : hauteur fixe, largeur auto pour respecter le ratio */
+.navbar-logo-img {
+  height: 32px;
+  width: auto;
+  display: block;
+}
+
+/* Bloc texte (nom d'app + tagline) */
+.navbar-text {
+  display: flex;
+  flex-direction: column;
+}
+
+/* Nom d'application (typographie mise en avant) */
+.navbar-app-name {
+  font-weight: 600;
+  font-size: 1.1rem;
+  letter-spacing: 0.03em;
+}
+
+/* Sous-titre / baseline (plus discret) */
+.navbar-tagline {
+  font-size: 0.75rem;
+  opacity: 0.9;
+}
+
+/* Bloc droit : actions (boutons, avatar, menus, etc.) */
+.navbar-right {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  font-size: 0.85rem;
+}
