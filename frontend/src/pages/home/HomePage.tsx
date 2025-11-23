@@ -201,6 +201,9 @@ const HomePage: React.FC = () => {
             </p>
 
             <div className="home-nav-chip-row">
+              <Link to="/siteboard" className="home-nav-chip">
+                Dashboard site
+              </Link>
               <Link to="/sla" className="home-nav-chip">
                 Dashboard SLA
               </Link>

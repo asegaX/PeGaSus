@@ -1,0 +1,12 @@
+/**
+ * Fichier : frontend/src/components/modal/SitesUnderMaintenanceNotInRtmcModal.css
+ *
+ * Styles spécifiques au contenu du modal
+ * "Sites en maintenance hors RTMC".
+ */
+
+.sumnr-body {
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+}

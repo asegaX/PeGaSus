@@ -1,0 +1,12 @@
+/**
+ * Fichier : frontend/src/components/modal/SitesUnderMaintenanceNoRmsModal.css
+ *
+ * Styles spécifiques au contenu du modal
+ * "Sites en maintenance sans RMS Teltonika".
+ */
+
+.sunos-body {
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+}

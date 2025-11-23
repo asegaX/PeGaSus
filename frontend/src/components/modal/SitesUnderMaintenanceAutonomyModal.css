@@ -1,0 +1,12 @@
+/**
+ * Fichier : frontend/src/components/modal/SitesUnderMaintenanceAutonomyModal.css
+ *
+ * Styles spécifiques au contenu du modal
+ * "Sites en maintenance – autonomie dégradée".
+ */
+
+.suam-body {
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+}

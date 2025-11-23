@@ -1,0 +1,66 @@
+# ============================================================
+# Fichier : docker-compose.yml
+#
+# Orchestration des conteneurs en environnement de développement.
+#
+# Services :
+# ----------
+# - db       : PostgreSQL ;
+# - backend  : API FastAPI (Uvicorn avec --reload) ;
+# - frontend : Vite/React (dev server, port 5173).
+# ============================================================
+
+services:
+  db:
+    # Image PostgreSQL avec PostGIS intégré
+    # Adapte le tag en fonction de ce que tu trouves sur Docker Hub :
+    # par ex. postgis/postgis:16-3.4 ou une autre variante 16-*
+    image: postgis/postgis:16-3.4
+    container_name: pegasus-db
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: pegasus
+      POSTGRES_USER: asega
+      POSTGRES_PASSWORD: "asega@1965"
+    ports:
+      - "5433:5432"
+    volumes:
+      - pegasus_pg_data:/var/lib/postgresql/data
+
+
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: pegasus-backend
+    restart: unless-stopped
+    env_file:
+      - ./backend/.env.docker
+    depends_on:
+      - db
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./backend:/app
+    command: uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: pegasus-frontend
+    restart: unless-stopped
+    depends_on:
+      - backend
+    ports:
+      - "5173:5173"
+    volumes:
+      - ./frontend:/app
+      - pegasus_node_modules_frontend:/app/node_modules
+    environment:
+      - VITE_API_BASE_URL=http://localhost:8000
+
+volumes:
+  pegasus_pg_data:
+  pegasus_node_modules_frontend:
+# ============================================================

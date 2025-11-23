@@ -1,0 +1,398 @@
+/**
+ * Fichier : frontend/src/components/modal/PremiumModal.css
+ *
+ * Styles génériques pour :
+ * - PremiumModal : le cadre visuel des modals "premium" ;
+ * - ModalTable   : tableau réutilisable avec tri + recherche globale.
+ */
+
+/* ========================= Overlay & boîte modale ======================== */
+
+.premium-modal-overlay {
+  position: fixed;
+  inset: 0;
+  background-color: rgba(15, 23, 42, 0.55);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 50;
+}
+
+.premium-modal {
+  background-color: #ffffff;
+  border-radius: 1rem;
+  box-shadow: 0 24px 60px rgba(15, 23, 42, 0.35);
+  width: min(960px, 96vw);
+  max-height: 88vh;
+  display: flex;
+  flex-direction: column;
+  border: 1px solid #e5e7eb;
+  overflow: hidden;
+  font-family: "Inter", system-ui, -apple-system, BlinkMacSystemFont,
+    "Segoe UI", sans-serif;
+}
+
+/* Variantes de taille */
+.premium-modal--md {
+  width: min(720px, 96vw);
+}
+
+.premium-modal--lg {
+  width: min(960px, 96vw);
+}
+
+.premium-modal--xl {
+  width: min(1180px, 96vw);
+}
+
+/* Bandeau gradient supérieur */
+.premium-modal-topbar {
+  height: 4px;
+  background: linear-gradient(90deg, #1d4ed8 0%, #4f46e5 40%, #0ea5e9 100%);
+}
+
+/* =============================== Header ================================== */
+
+.premium-modal-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 0.75rem;
+  padding: 1rem 1.5rem 0.75rem;
+}
+
+.premium-modal-header-main {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  min-width: 0;
+}
+
+.premium-modal-header-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.65rem;
+}
+
+.premium-modal-icon {
+  width: 32px;
+  height: 32px;
+  border-radius: 999px;
+  background: radial-gradient(circle at 30% 30%, #4f46e5, #1d4ed8);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #ffffff;
+  font-size: 0.95rem;
+  box-shadow: 0 8px 20px rgba(79, 70, 229, 0.45);
+  flex-shrink: 0;
+}
+
+.premium-modal-header-text {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  min-width: 0;
+}
+
+.premium-modal-title {
+  margin: 0;
+  font-size: 1.15rem;
+  font-weight: 600;
+  color: #111827;
+}
+
+.premium-modal-description {
+  margin: 0;
+  font-size: 0.86rem;
+  color: #6b7280;
+}
+
+.premium-modal-description code {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas,
+    "Liberation Mono", "Courier New", monospace;
+  font-size: 0.78rem;
+}
+
+/* Badges header */
+.premium-modal-badges {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+  align-items: center;
+}
+
+.premium-modal-badge-primary {
+  padding: 0.15rem 0.6rem;
+  border-radius: 999px;
+  font-size: 0.78rem;
+  font-weight: 500;
+  background: linear-gradient(90deg, #eff6ff 0%, #eef2ff 50%, #e0f2fe 100%);
+  border: 1px solid rgba(59, 130, 246, 0.4);
+  color: #1d4ed8;
+}
+
+.premium-modal-badge-secondary {
+  padding: 0.12rem 0.55rem;
+  border-radius: 999px;
+  font-size: 0.76rem;
+  background-color: #f9fafb;
+  border: 1px dashed rgba(148, 163, 184, 0.9);
+  color: #4b5563;
+}
+
+/* Bouton de fermeture */
+.premium-modal-close-btn {
+  border: none;
+  background-color: transparent;
+  cursor: pointer;
+  width: 32px;
+  height: 32px;
+  border-radius: 999px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: #6b7280;
+  transition:
+    background-color 0.12s ease,
+    color 0.12s ease;
+  flex-shrink: 0;
+}
+
+.premium-modal-close-btn:hover {
+  background-color: #f3f4f6;
+  color: #111827;
+}
+
+/* =========================== Corps & footer ============================== */
+
+.premium-modal-body {
+  padding: 0.75rem 1.5rem 0.75rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+  max-height: calc(88vh - 170px);
+  overflow: hidden;
+}
+
+.premium-modal-footer {
+  padding: 0.55rem 1.5rem 0.85rem;
+  border-top: 1px solid #e5e7eb;
+  background-color: #f9fafb;
+  border-bottom-left-radius: 1rem;
+  border-bottom-right-radius: 1rem;
+  font-size: 0.78rem;
+  color: #6b7280;
+}
+
+.premium-modal-footer code {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas,
+    "Liberation Mono", "Courier New", monospace;
+  font-size: 0.76rem;
+}
+
+/* ========================================================================== */
+/*                       ModalTable (tri + recherche)                         */
+/* ========================================================================== */
+
+.modal-table-root {
+  display: flex;
+  flex-direction: column;
+  gap: 0.45rem;
+}
+
+/* Toolbar */
+.modal-table-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+}
+
+.modal-table-count {
+  font-size: 0.78rem;
+  color: #6b7280;
+}
+
+.modal-table-toolbar-right {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+/* Recherche globale */
+.modal-table-search {
+  position: relative;
+  width: 210px;
+  max-width: 100%;
+}
+
+.modal-table-search-icon {
+  position: absolute;
+  left: 9px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 16px;
+  height: 16px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: #9ca3af;
+}
+
+.modal-table-search-input {
+  width: 100%;
+  padding: 0.3rem 0.8rem 0.3rem 1.9rem;
+  border-radius: 999px;
+  border: 1px solid #e5e7eb;
+  font-size: 0.8rem;
+  outline: none;
+  background-color: #f9fafb;
+}
+
+/* États : erreur / messages */
+.modal-table-error {
+  border-radius: 0.5rem;
+  border: 1px solid rgba(239, 68, 68, 0.3);
+  background-color: rgba(254, 242, 242, 0.96);
+  padding: 0.45rem 0.7rem;
+  font-size: 0.85rem;
+  color: #991b1b;
+}
+
+.modal-table-message {
+  font-size: 0.88rem;
+  color: #6b7280;
+}
+
+/* Wrapper + table */
+.modal-table-wrapper {
+  border-radius: 0.75rem;
+  border: 1px solid #e5e7eb;
+  background-color: #f9fafb;
+  overflow: auto;
+  flex: 1;
+  max-height: 100%;
+}
+
+/* Scrollbar légère */
+.modal-table-wrapper::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+.modal-table-wrapper::-webkit-scrollbar-thumb {
+  background-color: rgba(156, 163, 175, 0.7);
+  border-radius: 999px;
+}
+
+.modal-table-wrapper::-webkit-scrollbar-track {
+  background-color: transparent;
+}
+
+.modal-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.83rem;
+}
+
+.modal-table thead {
+  background: linear-gradient(
+    90deg,
+    #f3f4f6 0%,
+    #eef2ff 50%,
+    #eff6ff 100%
+  );
+}
+
+.modal-table-header-cell {
+  padding: 0.4rem 0.6rem;
+  border-bottom: 1px solid #e5e7eb;
+  font-weight: 600;
+  color: #4b5563;
+  font-size: 0.8rem;
+  white-space: nowrap;
+  cursor: pointer;
+  user-select: none;
+}
+
+.modal-table-header-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+.modal-table-sort-indicator {
+  font-size: 0.7rem;
+  color: #6b7280;
+}
+
+.modal-table tbody tr:nth-child(even) {
+  background-color: #ffffff;
+}
+
+.modal-table tbody tr:nth-child(odd) {
+  background-color: #f9fafb;
+}
+
+.modal-table-cell {
+  padding: 0.4rem 0.6rem;
+  border-bottom: 1px solid #e5e7eb;
+  color: #111827;
+  max-width: 260px;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  overflow: hidden;
+}
+
+/* ========================================================================== */
+/*  ModalTable : scroll + pagination                                          */
+/* ========================================================================== */
+
+.modal-table-wrapper {
+  max-height: 55vh;         /* garde le modal lisible */
+  overflow: auto;           /* scroll interne si nécessaire */
+  border-radius: 0.8rem;
+  border: 1px solid #e5e7eb;
+  background: #ffffff;
+}
+
+.modal-table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+  min-width: 720px;         /* évite l’écrasement des colonnes */
+}
+
+.modal-table-pagination {
+  margin-top: 0.65rem;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 0.6rem;
+}
+
+.modal-table-page-btn {
+  border: 1px solid #e5e7eb;
+  background: #ffffff;
+  padding: 0.35rem 0.7rem;
+  border-radius: 999px;
+  font-size: 0.8rem;
+  cursor: pointer;
+  transition: background-color 120ms ease, transform 80ms ease;
+}
+
+.modal-table-page-btn:hover:not(:disabled) {
+  background: #f3f4f6;
+  transform: translateY(-1px);
+}
+
+.modal-table-page-btn:disabled {
+  opacity: 0.5;
+  cursor: default;
+}
+
+.modal-table-page-info {
+  font-size: 0.8rem;
+  color: #6b7280;
+}

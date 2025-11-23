@@ -41,6 +41,7 @@ import TrbPage from "./pages/trb/TrbPage";
 import PmwoPage from "./pages/pmwo/PmwoPage";
 import SwoPage from "./pages/swo/SwoPage";
 
+import SiteBoard from "./pages/siteboard/SiteBoardPage";
 import SlaPage from "./pages/sla/SlaPage";
 import DailyPage from "./pages/daily/DailyPage";
 import WeeklyPage from "./pages/weekly/WeeklyPage";
@@ -60,6 +61,7 @@ type TableId = "sites" | "trb" | "pmwo" | "swo";
  * Identifiants possibles pour les dashboards de la barre latérale.
  */
 type DashboardId =
+  | "siteboard"
   | "sla"
   | "daily"
   | "weekly"
@@ -184,6 +186,50 @@ const SwoIcon: React.FC = () => (
     />
   </svg>
 );
+
+/**
+ * Icône "SiteBoard" : vue agrégée par site (carte + site).
+ */
+const SiteBoardIcon: React.FC = () => (
+  <svg
+    width="18"
+    height="18"
+    viewBox="0 0 24 24"
+    fill="none"
+    aria-hidden="true"
+  >
+    {/* fond carte */}
+    <rect
+      x="3"
+      y="4"
+      width="18"
+      height="14"
+      rx="2"
+      ry="2"
+      stroke="currentColor"
+      strokeWidth={1.6}
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />
+    {/* tour / site */}
+    <path
+      d="M9 15V9.5L12 6l3 3.5V15"
+      stroke="currentColor"
+      strokeWidth={1.6}
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />
+    {/* base */}
+    <path
+      d="M7.5 15h9"
+      stroke="currentColor"
+      strokeWidth={1.6}
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />
+  </svg>
+);
+
 
 /**
  * Icône "SLA" : jauge / indicateur de niveau de service.
@@ -366,6 +412,7 @@ const PendingSwoIcon: React.FC = () => (
  * - path  : route associée ("/sla", "/daily", etc.).
  */
 const NAV_DASHBOARD_ITEMS: NavSidebarItem[] = [
+  { id: "siteboard", label: "SiteBoard", icon: <SiteBoardIcon />, path: "/siteboard" },
   { id: "sla",        label: "SLA",          icon: <SlaIcon />,        path: "/sla" },
   { id: "daily",      label: "Daily",        icon: <DailyIcon />,      path: "/daily" },
   { id: "weekly",     label: "Weekly",       icon: <WeeklyIcon />,     path: "/weekly" },
@@ -407,6 +454,7 @@ const ALL_NAV_ITEMS: NavSidebarItem[] = [
  * - "/sites"      → "sites"
  * - "/trb"        → "trb"
  * - "/pmwo"       → "pmwo"
+ * - "/siteboard"  → "siteboard"
  * - "/swo"        → "swo"
  * - "/sla"        → "sla"
  * - "/daily"      → "daily"
@@ -542,6 +590,7 @@ const App: React.FC = () => {
           <Route path="/swo" element={<SwoPage />} />
 
           {/* Dashboards (pages vides pour l'instant) */}
+          <Route path="/siteboard" element={<SiteBoard />} />
           <Route path="/sla" element={<SlaPage />} />
           <Route path="/daily" element={<DailyPage />} />
           <Route path="/weekly" element={<WeeklyPage />} />

@@ -1,0 +1,13 @@
+/**
+ * Fichier : frontend/src/components/modal/SitesNotUnderMaintenanceModal.css
+ *
+ * Styles spécifiques au contenu du modal "Sites hors maintenance".
+ * Le cadre (overlay, header, footer) et le tableau générique sont
+ * gérés par `PremiumModal.css`.
+ */
+
+.snm-body {
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+}
